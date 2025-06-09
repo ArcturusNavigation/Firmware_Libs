@@ -23,4 +23,5 @@ class CC1200 {
         void _writeReg(unsigned int reg, byte val);
         byte _readReg(unsigned int reg);
         byte _strobe(byte cmd);
+        int _cs;
 };
