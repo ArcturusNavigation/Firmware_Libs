@@ -10,6 +10,7 @@ class CC1200 {
         void begin();
         byte status();
         void simpleConfig();
+        void narrowConfig();
         bool ready();
         byte partnum();
         bool testTx();
