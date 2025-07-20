@@ -308,6 +308,100 @@ void BQ76942::OTPdebug() {
     }
 }
 
+void BQ76942::statusReadout() {
+    _dirCmdR(0x12, 2);
+    uint16_t status = (_buf[1] << 8) + _buf[0];
+    
+    if (status & 1) {
+        Serial.println("Device is in CONFIG_UPDATE mode.");
+    } else {
+        Serial.println("Device is not in CONFIG_UPDATE mode.");
+    }
+
+    if (status & (1 << 1)) {
+        Serial.println("Device is in PRECHARGE mode.");
+    } else {
+        Serial.println("Device is not in PRECHARGE mode.");
+    }
+
+    if (status & (1 << 2)) {
+        Serial.println("SLEEP mode is allowed when other SLEEP conditions are met.");
+    } else {
+        Serial.println("SLEEP mode is disabled by the host.");
+    }
+
+    if (status & (1 << 3)) {
+        Serial.println("Full reset has occurred since last exit of CONFIG_UPDATE and reconfiguration of any RAM settings is required.");
+    } else {
+        Serial.println("Full reset has not occurred since last exit of CONFIG_UPDATE mode.");
+    }
+
+    if (status & (1 << 4)) {
+        Serial.println("Previous reset was caused by the watchdog timer.");
+    } else {
+        Serial.println("Previous reset was normal.");
+    }
+
+    if (status & (1 << 5)) {
+        Serial.println("Device is actively performing a cell open-wire check.");
+    } else {
+        Serial.println("Device is not actively performing a cell open-wire check.");
+    }
+
+    if (status & (1 << 6)) {
+        Serial.println("Writes to OTP are pending.");
+    } else {
+        Serial.println("No writes to OTP are pending.");
+    }
+
+    if (status & (1 << 7)) {
+        Serial.println("Writes to OTP are blocked");
+    } else {
+        Serial.println("OTP writes are allowed.");
+    }
+
+    if (status & (3 << 8) == 0) {
+        Serial.println("Device has not initialized yet.");
+    } else if (status & (3 << 8) == 1) {
+        Serial.println("Device is in FULLACCESS mode.");
+    } else if (status & (3 << 8) == 2) {
+        Serial.println("Device is in UNSEALED mode.");
+    } else {
+        Serial.println("Device is in SEALED mode.");
+    }
+
+    if (status & (1 << 10)) {
+        Serial.println("FUSE pin was asserted by device or secondary protector at last sample.");
+    } else {
+        Serial.println("FUSE pin was not asserted by device or secondary protector at last sample.");
+    }
+
+    if (status & (1 << 11)) {
+        Serial.println("At least one enabled safety fault is triggered.");
+    } else {
+        Serial.println("No safety fault is triggered.");
+    }
+
+    if (status & (1 << 12)) {
+        Serial.println("At least one Permanent Fail fault has triggered.");
+    } else {
+        Serial.println("No Permanent Fail fault has triggered.");
+    }
+
+    if (status & (1 << 13)) {
+        Serial.println("Device is actively performing a cell open-wire check.");
+    } else {
+        Serial.println("Device is not actively performing a cell open-wire check.");
+    }
+
+    if (status & (1 << 15)) {
+        Serial.println("Device is in SLEEP mode.");
+    } else {
+        Serial.println("Device is not in SLEEP mode.");
+    }
+
+}
+
 bool BQ76942::fullAccessCheck() {
     _dirCmdR(0x12, 2);
     return (_buf[1] & 0x03) == 0x01;
