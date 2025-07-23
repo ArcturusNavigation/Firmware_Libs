@@ -213,6 +213,11 @@ byte BQ76942::fetStatus() {
     return _buf[0];
 }
 
+uint16_t BQ76942::statusHex() {
+    _dirCmdR(0x12, 2);
+    return (_buf[1] << 8) + _buf[0];
+}
+
 bool BQ76942::ddsgConfig(byte config) {
     /*_writeSubCmdAdr(0x0090, true);
     delay(1000);

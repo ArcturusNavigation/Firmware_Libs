@@ -28,6 +28,7 @@ class BQ76942 {
         bool fullAccessCheck();
         bool writeOTP();
         void statusReadout();
+        uint16_t statusHex();
 
     private:
         TwoWire* _Wire;
