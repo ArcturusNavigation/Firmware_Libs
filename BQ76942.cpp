@@ -394,9 +394,9 @@ void BQ76942::statusReadout() {
     }
 
     if (status & (1 << 13)) {
-        Serial.println("Device is actively performing a cell open-wire check.");
+        Serial.println("Shutdown due to command or pin is pending.");
     } else {
-        Serial.println("Device is not actively performing a cell open-wire check.");
+        Serial.println("Shutdown due to command or pin is not pending.");
     }
 
     if (status & (1 << 15)) {
