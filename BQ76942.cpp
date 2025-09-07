@@ -202,6 +202,7 @@ bool BQ76942::enableFet() {
     Serial.print("BYTE 2: 0x");
     Serial.println(_buf[1]);
     _writeSubCmdAdr(0x0092, true);*/
+    _writeMemBytes(0x9308, 0x1C);
     _writeMemBytes(0x9343, 0x10);
     
     //to-do: verify write
