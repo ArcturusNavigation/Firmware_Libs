@@ -6,10 +6,10 @@
 #define SCLK PA5
 #define CS   PA4
 
-SPIClass SPI_3(MOSI, MISO, SCLK, CS);
+SPIClass SPI_3(MOSI, MISO, SCLK, -1);
 SPISettings settings(1000000, MSBFIRST, SPI_MODE0);
 
-CC1200 cc(&SPI_3, settings);
+CC1200 cc(&SPI_3, settings, CS);
 
 void setup() {
     // put your setup code here, to run once:

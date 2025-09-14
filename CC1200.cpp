@@ -53,6 +53,7 @@ byte CC1200::_strobe(byte cmd) {
     digitalWrite(_cs, 0);
     byte ret = _SPI->transfer(cmd);
     digitalWrite(_cs, 1);
+    return ret;
 }
 
 byte CC1200::status() {
