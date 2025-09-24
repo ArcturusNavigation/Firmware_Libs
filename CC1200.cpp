@@ -9,6 +9,7 @@ CC1200::CC1200(SPIClass* SPI, SPISettings settings, int cs) {
 }
 
 void CC1200::begin() {
+    pinMode(_cs, OUTPUT);
     digitalWrite(_cs, 1);
     _SPI->begin();
     _SPI->beginTransaction(_settings);
@@ -73,7 +74,53 @@ byte CC1200::status() {
 
 
 void CC1200::simpleConfig() {
-
+    _writeReg(0x0003, 0b01110011);
+    //_writeReg(0x0001,0x06);
+    _writeReg(0x0004,0x6F);
+    _writeReg(0x0005,0x4E);
+    _writeReg(0x0006,0x90);
+    _writeReg(0x0007,0x4E);
+    _writeReg(0x0008,0xAB);
+    _writeReg(0x0009,0x23);
+    _writeReg(0x000A,0x47);
+    _writeReg(0x000C,0x56);
+    _writeReg(0x000E,0xBA);
+    _writeReg(0x000F,0xC8);
+    _writeReg(0x0010,0x84);
+    _writeReg(0x0011,0x42);
+    _writeReg(0x0012,0x05);
+    _writeReg(0x0013,0x94);
+    _writeReg(0x0014,0x7A);
+    _writeReg(0x0015,0xE1);
+    _writeReg(0x0016,0x27);
+    _writeReg(0x0017,0x01);
+    _writeReg(0x001B,0x11);
+    _writeReg(0x001C,0x90);
+    _writeReg(0x001D,0x00);
+    _writeReg(0x0020,0x12);
+    _writeReg(0x002E,0x03); //PKT_LEN
+    _writeReg(0x2F00,0x18);
+    _writeReg(0x2F02,0x03);
+    _writeReg(0x2F05,0x02);
+    _writeReg(0x2F0C,0x5B);
+    _writeReg(0x2F0D,0x80);
+    _writeReg(0x2F10,0xEE);
+    _writeReg(0x2F11,0x10);
+    _writeReg(0x2F12,0x04);
+    _writeReg(0x2F13,0x55);
+    _writeReg(0x2F16,0x40);
+    _writeReg(0x2F17,0x0E);
+    _writeReg(0x2F19,0x03);
+    _writeReg(0x2F1B,0x33);
+    _writeReg(0x2F1D,0x17);
+    _writeReg(0x2F1F,0x00);
+    _writeReg(0x2F20,0x6E);
+    _writeReg(0x2F21,0x1C);
+    _writeReg(0x2F22,0xAC);
+    _writeReg(0x2F27,0xB5);
+    _writeReg(0x2F2F,0x05);
+    _writeReg(0x2F32,0x0E);
+    _writeReg(0x2F36,0x03);
 }
 
 void CC1200::narrowConfig() {
@@ -125,6 +172,15 @@ bool CC1200::ready() {
     return rdy;
 }
 
+int8_t CC1200::rssi() {
+    return _readReg(0x2F71);
+}
+
+float CC1200::fullrssi() {
+    int16_t rdg = (_readReg(0x2F71) << 8) + _readReg(0x2F72);
+    return rdg / 256.0;
+}
+
 byte CC1200::partnum() {
     return _readReg(0x2F8F);
 }
@@ -132,14 +188,17 @@ byte CC1200::partnum() {
 bool CC1200::testTx() {
     byte data[3] = {0xAA, 0xBB, 0xCC};
     digitalWrite(_cs, 0);
+    //_SPI->transfer(0x3F);
+    //_SPI->transfer(0xAB);
     _SPI->transfer(0x3F | BURST); //FIFO ADR
-    _SPI->transfer(0xAABBCC, 3); //TEST DATA
+    _SPI->transfer(data, 3); //TEST DATA
     digitalWrite(_cs, 1);
 
     _strobe(0x35); //STX
 
     unsigned long stime = millis();
     while (status() != 0x00) {
+        delay(100);
         if(millis() - stime > 1000) {
             return false;
         }
@@ -158,6 +217,9 @@ byte CC1200::avail() {
 void CC1200::read(byte* buf) {
     digitalWrite(_cs, 0);
     _SPI->transfer(0x3F | READ | BURST); //FIFO ADR
-    _SPI->transfer(buf, 3); //TEST DATA
+    _SPI->transfer(buf, 3); //3TEST DATA
     digitalWrite(_cs, 1);
+
+    _strobe(0x3A);
+    //_strobe(0x34);
 }

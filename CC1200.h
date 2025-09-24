@@ -18,6 +18,8 @@ class CC1200 {
         byte avail();
         void read(byte* buf);
         byte reset();
+        int8_t rssi();
+        float fullrssi();
     private:
         SPIClass* _SPI;
         SPISettings _settings;
