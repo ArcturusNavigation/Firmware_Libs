@@ -20,6 +20,7 @@ class CC1200 {
         byte reset();
         int8_t rssi();
         float fullrssi();
+        void sineWave();
     private:
         SPIClass* _SPI;
         SPISettings _settings;

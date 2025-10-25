@@ -74,8 +74,9 @@ byte CC1200::status() {
 
 
 void CC1200::simpleConfig() {
-    _writeReg(0x0003, 0b01110011);
+    //_writeReg(0x0003, 0b01110011); //PA ON
     //_writeReg(0x0001,0x06);
+    //_writeReg(0x0001, 0b01110011); //LNA ON
     _writeReg(0x0004,0x6F);
     _writeReg(0x0005,0x4E);
     _writeReg(0x0006,0x90);
@@ -98,7 +99,7 @@ void CC1200::simpleConfig() {
     _writeReg(0x001C,0x90);
     _writeReg(0x001D,0x00);
     _writeReg(0x0020,0x12);
-    _writeReg(0x002E,0x03); //PKT_LEN
+    _writeReg(0x002E,0x80); //PKT_LEN = 128
     _writeReg(0x2F00,0x18);
     _writeReg(0x2F02,0x03);
     _writeReg(0x2F05,0x02);
@@ -172,6 +173,11 @@ bool CC1200::ready() {
     return rdy;
 }
 
+void CC1200::sineWave() {
+    _writeReg(0x2F05,0x01);
+    _strobe(0x35);
+}
+
 int8_t CC1200::rssi() {
     return _readReg(0x2F71);
 }
@@ -186,6 +192,8 @@ byte CC1200::partnum() {
 }
 
 bool CC1200::testTx() {
+    _writeReg(0x0001, 0b00110011); //LNA OFF
+    _writeReg(0x0003, 0b01110011); //PA ON
     byte data[3] = {0xAA, 0xBB, 0xCC};
     digitalWrite(_cs, 0);
     //_SPI->transfer(0x3F);
@@ -207,6 +215,8 @@ bool CC1200::testTx() {
 }
 
 void CC1200::testRx() {
+    _writeReg(0x0003, 0b00110011); //PA OFF
+    _writeReg(0x0001, 0b01110011); //LNA ON
     _strobe(0x34); //SRX
 }
 
