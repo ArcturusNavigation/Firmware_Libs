@@ -14,9 +14,11 @@ class CC1200 {
         bool ready();
         byte partnum();
         bool testTx();
+        void Tx(uint8_t *data, uint8_t len);
+        void Rx(uint8_t len);
         void testRx();
         byte avail();
-        void read(byte* buf);
+        void read(byte* buf, byte len);
         byte reset();
         int8_t rssi();
         float fullrssi();

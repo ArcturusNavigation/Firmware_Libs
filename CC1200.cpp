@@ -74,7 +74,7 @@ byte CC1200::status() {
 
 
 void CC1200::simpleConfig() {
-    //_writeReg(0x0003, 0b01110011); //PA ON
+    _writeReg(0x0003, 0b01110011); //PA ON
     //_writeReg(0x0001,0x06);
     //_writeReg(0x0001, 0b01110011); //LNA ON
     _writeReg(0x0004,0x6F);
@@ -99,6 +99,7 @@ void CC1200::simpleConfig() {
     _writeReg(0x001C,0x90);
     _writeReg(0x001D,0x00);
     _writeReg(0x0020,0x12);
+    _writeReg(0x0027,0b10); //
     _writeReg(0x002E,0x80); //PKT_LEN = 128
     _writeReg(0x2F00,0x18);
     _writeReg(0x2F02,0x03);
@@ -214,9 +215,29 @@ bool CC1200::testTx() {
     return true;
 }
 
+void CC1200::Tx(uint8_t *data, uint8_t len) {
+    _writeReg(0x0001, 0b00110011); //LNA OFF
+    _writeReg(0x0003, 0b01110011); //PA ON
+    _writeReg(0x002E, len); //PKT_LEN
+    digitalWrite(_cs, 0);
+    _SPI->transfer(0x3F | BURST); //FIFO ADR
+    for(int i = 0; i < len; i++) {
+        _SPI->transfer(data[i]);
+    }
+    digitalWrite(_cs, 1);
+    _strobe(0x35); //STX
+}
+
 void CC1200::testRx() {
     _writeReg(0x0003, 0b00110011); //PA OFF
     _writeReg(0x0001, 0b01110011); //LNA ON
+    _strobe(0x34); //SRX
+}
+
+void CC1200::Rx(uint8_t len) {
+    _writeReg(0x0003, 0b00110011); //PA OFF
+    _writeReg(0x0001, 0b01110011); //LNA ON
+    _writeReg(0x002E, len); //PKT_LEN
     _strobe(0x34); //SRX
 }
 
@@ -224,10 +245,10 @@ byte CC1200::avail() {
     return _readReg(0x2FD7); //NUM_RXBYTES
 }
 
-void CC1200::read(byte* buf) {
+void CC1200::read(byte* buf, byte len) {
     digitalWrite(_cs, 0);
     _SPI->transfer(0x3F | READ | BURST); //FIFO ADR
-    _SPI->transfer(buf, 3); //3TEST DATA
+    _SPI->transfer(buf, len);
     digitalWrite(_cs, 1);
 
     _strobe(0x3A);
