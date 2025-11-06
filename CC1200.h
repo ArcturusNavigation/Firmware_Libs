@@ -23,6 +23,7 @@ class CC1200 {
         int8_t rssi();
         float fullrssi();
         void sineWave();
+        void flushRx();
     private:
         SPIClass* _SPI;
         SPISettings _settings;

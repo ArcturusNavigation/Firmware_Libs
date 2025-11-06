@@ -254,3 +254,7 @@ void CC1200::read(byte* buf, byte len) {
     _strobe(0x3A);
     //_strobe(0x34);
 }
+
+void CC1200::flushRx() {
+    _strobe(0x3A);
+}
